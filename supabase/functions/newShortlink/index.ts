@@ -26,7 +26,7 @@ serve(async (req) => {
       !apiKey ||
       typeof apiKey !== "string"
     ) {
-      throw new Error("Missing parameters!");
+      throw new Error("Missing parameters at edge function!");
     }
 
     if (apiKey !== apiKeyHash) {
