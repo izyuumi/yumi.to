@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 defineProps<{
-  link: {
+  shortlink: {
     id: string
     short: string
     link: string
@@ -13,9 +13,9 @@ defineProps<{
 <template lang="pug">
 li.flex.justify-between.flex-col
   div.flex.justify-between
-    p {{ link.short }} 
+    p {{ shortlink.short }} 
     div.flex
-      button.mr-2.text-green-500.p-1.rounded-md(@click="copy(link.short)") Copy
-      button.text-gray-400.p-1.rounded-md(@click="startEditing(link.id)") Edit
-  p {{ link.link }}
+      button.mr-2.text-green-500.p-1.rounded-md(@click="copy(shortlink.short)") Copy
+      button.text-gray-400.p-1.rounded-md(@click="startEditing(shortlink.id)") Edit
+  p {{ shortlink.link }}
 </template>

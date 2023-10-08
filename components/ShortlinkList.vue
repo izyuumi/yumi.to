@@ -1,11 +1,5 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import type Database from '@/types/supabase'
-
-interface Shortlink {
-  id: string
-  short: string
-  link: string
-}
 
 const emptyShortlink: Shortlink = {
   id: '',
@@ -22,7 +16,7 @@ const { data } = useAsyncData(async () => {
   return data
 })
 
-const links = ref(data.value)
+const shortlinks = ref(data.value)
 
 const copy = (text: string) => {
   const domain = window.location.origin
@@ -39,8 +33,8 @@ const setEditing = (value: boolean) => {
 }
 const startEditing = (id: string) => {
   setEditing(true)
-  if (!links.value) return
-  const shortlink = links.value.find(link => link.id === id)
+  if (!shortlinks.value) return
+  const shortlink = shortlinks.value.find(link => link.id === id)
   if (shortlink) {
     editingShortlink.value = shortlink
   }
@@ -56,8 +50,8 @@ const save = async () => {
     .match({ id: editingShortlink.value.id })
     .select('*')
     .single()
-  if (!links.value || !data) return
-  links.value = links.value.map(link => {
+  if (!shortlinks.value || !data) return
+  shortlinks.value = shortlinks.value.map(link => {
     if (link.id === data.id) {
       return data
     }
@@ -71,11 +65,38 @@ const deleteShortlink = async () => {
     .from('shortlinks')
     .delete()
     .match({ id: editingShortlink.value.id })
-  if (!links.value) return
-  links.value = links.value.filter(
+  if (!shortlinks.value) return
+  shortlinks.value = shortlinks.value.filter(
     link => link.id !== editingShortlink.value.id
   )
   setEditing(false)
+}
+
+const creating = ref(false)
+const startCreating = () => {
+  creating.value = true
+}
+const createShort = ref('')
+const createLink = ref('')
+const cancelCreate = () => {
+  creating.value = false
+  createShort.value = ''
+  createLink.value = ''
+}
+const saveCreate = async () => {
+  const supabase = useSupabaseClient<Database>()
+  const { data } = await supabase
+    .from('shortlinks')
+    .insert({
+      short: createShort.value,
+      link: createLink.value
+    })
+    .select('*')
+    .single()
+  if (data && shortlinks.value) {
+    shortlinks.value = [data, ...shortlinks.value]
+  }
+  cancelCreate()
 }
 </script>
 
@@ -84,7 +105,15 @@ main.w-full.h-screen.flex.items-center.flex-col
   h1 Shortlinks
   div
     ul
-      LinkItem(v-for="link in links" :link="link" :key="link.short" :copy="copy" :startEditing="startEditing")
+      li
+        button.text-green-500.p-1.w-full.rounded-md(@click="startCreating" v-if="!creating") Create Shortlink
+        form(@submit.prevent="addShortlink" v-if="creating")
+          input(type="text" v-model="createShort" class="w-full rounded-md p-2 bg-zinc-700 text-white" placeholder="Short")
+          textarea(type="text" v-model="createLink" class="w-full rounded-md p-2 bg-zinc-700 text-white mt-2" placeholder="Long Link")
+          div.flex.flex-row.justify-center
+            button.text-gray-400.p-1.rounded-md(@click="cancelCreate") Cancel
+            button.text-green-500.p-1.rounded-md(@click="saveCreate") Add Shortlink
+      LinkItem(v-for="shortlink in shortlinks" :shortlink="shortlink" :key="shortlink.short" :copy="copy" :startEditing="startEditing")
   ClientOnly
     HeadlessDialog(:open="editing" @close="setEditing").fixed.top-0.left-0.right-0.bottom-0.flex.justify-center.items-center
       div(class="fixed inset-0 bg-black/30")
