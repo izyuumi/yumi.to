@@ -41,19 +41,15 @@ export default defineEventHandler(async (event) => {
 
     return {
       status: 200,
-      body: {
-        message: "Success! New short URL created!",
-        newShortlink: `${process.env.BASE_URL}/${short}`,
-      },
+      message: "Success! New short URL created!",
+      newShortlink: `${process.env.BASE_URL}/${short}`,
     };
   } catch (err) {
     console.error(err);
     let error = err as Error;
     return {
       status: 500,
-      body: {
-        message: `Error! ${error.message}`,
-      },
+      message: `Error! ${error.message}`,
     };
   }
 });
