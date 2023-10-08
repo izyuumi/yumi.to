@@ -5,13 +5,13 @@ import Database from "@/types/supabase";
 export default defineEventHandler(async (event) => {
   try {
     const { link } = getQuery(event);
-    const { apiKey } = getHeaders(event);
+    const { apikey } = getHeaders(event);
 
     if (
       !link ||
       typeof link !== "string" ||
-      !apiKey ||
-      typeof apiKey !== "string"
+      !apikey ||
+      typeof apikey !== "string"
     ) {
       throw new Error("Missing parameters!");
     }
@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
       body: JSON.stringify({
         short,
         link,
-        apiKey,
+        apiKey: apikey,
       }),
     });
 
