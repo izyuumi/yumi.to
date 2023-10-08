@@ -5,7 +5,7 @@ const user = useSupabaseUser()
 <script lang="ts">
 const authenticate = async () => {
   const supabase = useSupabaseClient()
-  const { data, error } = await supabase.auth.signInWithOAuth({
+  const { error } = await supabase.auth.signInWithOAuth({
     provider: 'github',
     options: {
       redirectTo: 'https://yumi.to/dashboard'
@@ -13,14 +13,13 @@ const authenticate = async () => {
   })
   if (error) {
     console.error(error)
-    return
   }
 }
 </script>
 
 <template lang="pug">
 ShortlinkList(v-if="user")
-div.flex.flex-col.items-center.justify-center.h-screen
+div.flex.flex-col.items-center.justify-center.h-screen(v-if="!user")
   button(@click="authenticate") Authenticte with GitHub
 </template>
 <style lang="scss">
