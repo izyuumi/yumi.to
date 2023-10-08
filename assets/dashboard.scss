@@ -41,8 +41,8 @@ ul {
     padding: 1rem;
     border-radius: 0.5rem;
 
-    &:hover,
-    &:focus-within {
+    &:not(#add-shortlink):hover,
+    &:not(#add-shortlink):focus-within {
       background-color: rgba(var(--text-color-rgb), 0.2);
     }
 
