@@ -4,7 +4,8 @@ import Database from "@/types/supabase";
 
 export default defineEventHandler(async (event) => {
   try {
-    const { link, apiKey } = getQuery(event);
+    const { link } = getQuery(event);
+    const { apiKey } = getHeaders(event);
 
     if (
       !link ||
