@@ -9,25 +9,22 @@ const emptyShortlink: Shortlink = {
 
 const query = ref('')
 
-const { data } = useAsyncData(async () => {
-  const supabase = useSupabaseClient<Database>()
-  const { data } = await supabase
-    .from('shortlinks')
-    .select('*')
-    .order('created_at', { ascending: false })
-  return data
-})
+const supabase = useSupabaseClient<Database>()
+const { data } = await supabase
+  .from('shortlinks')
+  .select('*')
+  .order('created_at', { ascending: false })
 
-const shortlinks = ref(data.value)
+const shortlinks = ref(data)
 
 const search = () => {
-  if (query.value.length > 0 && shortlinks.value && data.value) {
-    shortlinks.value = data.value.filter(
+  if (query.value.length > 0 && shortlinks.value && data) {
+    shortlinks.value = data.filter(
       link =>
         link.short.includes(query.value) || link.link.includes(query.value)
     )
   } else {
-    shortlinks.value = data.value
+    shortlinks.value = data
   }
 }
 
@@ -153,4 +150,12 @@ main.w-full.h-screen.flex.items-center.flex-col
             button.mr-2.text-gray-400.p-1.rounded-md(@click="setEditing(false)") Cancel
             button.mr-2.text-red-500.p-1.rounded-md(@click="deleteShortlink") Delete
             button.text-green-500.p-1.rounded-md(@click="save") Save
+
+  ClientOnly
+    HeadlessDialog(:open="qrcode" @close="setQrcode").fixed.top-0.left-0.right-0.bottom-0.flex.justify-center.items-center
+      div(class="fixed inset-0 bg-black/30")
+      div(class="fixed inset-0 flex w-screen items-center justify-center p-4")
+        HeadlessDialogPanel.rounded-md.p-4.bg-zinc-800
+          HeadlessDialogTitle QR Code
+          div.py-1
 </template>
