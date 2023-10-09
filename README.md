@@ -2,6 +2,8 @@
 
 Your personal URL shortener built with Nuxt, Supabase, Vercel, and TailwindCSS.
 
+![yumi.to](./readme/dashboard.png)
+
 ## Installation
 
 ### Requirements
