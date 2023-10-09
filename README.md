@@ -39,6 +39,7 @@ create table public.shortlinks (
 3. Add the following environment variables:
    - `SUPABASE_URL` (your Supabase URL e.g. `https://<your-project>.supabase.co`)
    - `SUPABASE_KEY` (your Supabase public anon key)
+   - `BASE_URL` (your domain name e.g. `https://yumi.to`)
 4. Follow the instructions [here](https://vercel.com/docs/projects/domains/add-a-domain) to set up your custom domain.
 
 ### Authentication with GitHub
@@ -76,6 +77,18 @@ create policy "Allow yourself to delete shortlinks" on public.shortlinks for del
 - Change `url` in `composables/useExternalRedirect.ts` to whatever you want default redirect to be (e.g. `https://yumiizumi.com`)
 - Change `redirectTo` option in `pages/dashboard.vue` to `<your-domain>/dashboard` (e.g. `https://yumi.to/dashboard`)
 - This project uses TailwindCSS for styling, so you can customize the styles by editing the component classes
+
+### Using with iOS Shortcuts
+
+You can use this project with iOS Shortcuts to create a custom URL shortener. To do this, you can use the following shortcut:
+
+1. Create an API key
+   1. Create a random string as the API key
+   2. Take the MD5 hash of the API key
+   3. Store the MD5 hash of the API key as `API_KEY_HASH` in your Supabase Edge Function Secrets Management settings
+2. Get the shortcut [here](https://yumi.to/aa)
+3. First time you run the shortcut, you will be prompted to enter your domain name (e.g. `yumi.to`) and the API key you created in step 1
+4. You are now ready to use the shortcut!
 
 ## License
 
