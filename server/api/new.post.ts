@@ -21,9 +21,22 @@ export default defineEventHandler(async (event) => {
       throw new Error("Invalid link! Must be a valid URL!");
     }
 
-    const short = nanoid(6);
-
     const supabase = await serverSupabaseClient<Database>(event);
+
+    let shortExists = true;
+    let short = "";
+    while (shortExists) {
+      short = nanoid(2);
+      const { data: existingShortlink, error: existingShortlinkError } =
+        await supabase
+          .from("shortlinks")
+          .select("*")
+          .eq("short", short)
+          .single();
+      if (!existingShortlink) {
+        shortExists = false;
+      }
+    }
 
     const { data, error } = await supabase.functions.invoke("newShortlink", {
       body: JSON.stringify({
