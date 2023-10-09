@@ -27,12 +27,11 @@ export default defineEventHandler(async (event) => {
     let short = "";
     while (shortExists) {
       short = nanoid(2);
-      const { data: existingShortlink, error: existingShortlinkError } =
-        await supabase
-          .from("shortlinks")
-          .select("*")
-          .eq("short", short)
-          .single();
+      const { data: existingShortlink } = await supabase
+        .from("shortlinks")
+        .select("*")
+        .eq("short", short)
+        .single();
       if (!existingShortlink) {
         shortExists = false;
       }
