@@ -31,10 +31,13 @@ h1 {
   margin-bottom: 1rem;
 }
 
-ul {
+ul,
+div#search {
   width: 600px;
   max-width: 95svw;
+}
 
+ul {
   li {
     background-color: rgba(var(--text-color-rgb), 0.1);
     margin-bottom: 1rem;

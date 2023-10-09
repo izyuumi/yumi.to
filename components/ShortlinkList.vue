@@ -7,6 +7,8 @@ const emptyShortlink: Shortlink = {
   link: ''
 }
 
+const query = ref('')
+
 const { data } = useAsyncData(async () => {
   const supabase = useSupabaseClient<Database>()
   const { data } = await supabase
@@ -17,6 +19,17 @@ const { data } = useAsyncData(async () => {
 })
 
 const shortlinks = ref(data.value)
+
+const search = () => {
+  if (query.value.length > 0 && shortlinks.value && data.value) {
+    shortlinks.value = data.value.filter(
+      link =>
+        link.short.includes(query.value) || link.link.includes(query.value)
+    )
+  } else {
+    shortlinks.value = data.value
+  }
+}
 
 const copy = (text: string) => {
   const domain = window.location.origin
@@ -100,9 +113,19 @@ const saveCreate = async () => {
 }
 </script>
 
+<script lang="ts">
+export default {
+  mounted() {
+    ;(this.$refs['search'] as HTMLInputElement).focus()
+  }
+}
+</script>
+
 <template lang="pug">
 main.w-full.h-screen.flex.items-center.flex-col
   h1 Shortlinks
+  div#search.mb-3
+    input(type="text" ref="search" v-model="query" @input="search" class="w-full rounded-md p-3 bg-zinc-700 text-white" placeholder="Search")
   div
     ul
       li
