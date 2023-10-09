@@ -29,8 +29,7 @@ const search = () => {
 }
 
 const copy = (text: string) => {
-  const domain = window.location.origin
-  navigator.clipboard.writeText(`${domain}/${text}`)
+  navigator.clipboard.writeText(`${window.location.origin}/${text}`)
 }
 
 const editing = ref(false)
@@ -111,9 +110,28 @@ const saveCreate = async () => {
 </script>
 
 <script lang="ts">
+import { useQRCode } from '@vueuse/integrations/useQRCode'
+
 export default {
   mounted() {
     ;(this.$refs['search'] as HTMLInputElement).focus()
+  }
+}
+
+let domain = ''
+if (typeof window !== 'undefined') {
+  domain = window.location.origin
+}
+const qrcode = ref(false)
+let qrcodeValue = ''
+let qrcodeImage = useQRCode(`${domain}/${qrcodeValue}`)
+const setQrcode = (bool: boolean, value?: string) => {
+  qrcode.value = bool
+  if (!bool || !value) {
+    qrcodeValue = ''
+  } else {
+    qrcodeValue = value
+    qrcodeImage = useQRCode(`${domain}/${qrcodeValue}`)
   }
 }
 </script>
@@ -133,7 +151,7 @@ main.w-full.h-screen.flex.items-center.flex-col
           div.flex.flex-row.justify-center
             button.text-gray-400.p-1.rounded-md(@click="cancelCreate") Cancel
             button.text-green-500.p-1.rounded-md(@click="saveCreate") Add Shortlink
-      LinkItem(v-for="shortlink in shortlinks" :shortlink="shortlink" :key="shortlink.short" :copy="copy" :startEditing="startEditing")
+      LinkItem(v-for="shortlink in shortlinks" :shortlink="shortlink" :key="shortlink.short" :copy="copy" :startEditing="startEditing" :setQrcode="setQrcode")
   ClientOnly
     HeadlessDialog(:open="editing" @close="setEditing").fixed.top-0.left-0.right-0.bottom-0.flex.justify-center.items-center
       div(class="fixed inset-0 bg-black/30")
@@ -156,6 +174,7 @@ main.w-full.h-screen.flex.items-center.flex-col
       div(class="fixed inset-0 bg-black/30")
       div(class="fixed inset-0 flex w-screen items-center justify-center p-4")
         HeadlessDialogPanel.rounded-md.p-4.bg-zinc-800
-          HeadlessDialogTitle QR Code
-          div.py-1
+          HeadlessDialogTitle {{ `${domain}/${qrcodeValue}` }}
+          div.py-2.flex.justify-center.w-full
+            img(:src="qrcodeImage" alt="QR Code")
 </template>
