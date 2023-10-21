@@ -14,17 +14,18 @@ const { data: exactData } = await supabase
 if (exactData?.link) {
   useExternalRedirect(exactData.link)
 } else {
-  const { data: similarData } = await supabase
+  const { data: startsWithData } = await supabase
     .from('shortlinks')
     .select('*')
     .like('short', `${params.short}%`)
     .maybeSingle()
 
-  if (similarData?.link) {
-    useExternalRedirect(similarData.link)
+  if (startsWithData?.link) {
+    useExternalRedirect(startsWithData.link)
+  } else {
+    useExternalRedirect()
   }
 }
-
 useExternalRedirect()
 </script>
 
