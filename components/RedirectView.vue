@@ -26,7 +26,6 @@ if (exactData?.link) {
     useExternalRedirect()
   }
 }
-useExternalRedirect()
 </script>
 
 <template lang="pug">
