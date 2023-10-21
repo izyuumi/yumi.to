@@ -5,17 +5,27 @@ import type Database from '@/types/supabase'
 const params = useRoute().params
 const supabase = useSupabaseClient<Database>()
 
-const { data } = await supabase
+const { data: exactData } = await supabase
   .from('shortlinks')
   .select('*')
-  .like('short', `${params.short}%`)
+  .eq('short', params.short)
   .maybeSingle()
 
-if (data?.link) {
-  useExternalRedirect(data.link)
+if (exactData?.link) {
+  useExternalRedirect(exactData.link)
 } else {
-  useExternalRedirect()
+  const { data: similarData } = await supabase
+    .from('shortlinks')
+    .select('*')
+    .like('short', `${params.short}%`)
+    .maybeSingle()
+
+  if (similarData?.link) {
+    useExternalRedirect(similarData.link)
+  }
 }
+
+useExternalRedirect()
 </script>
 
 <template lang="pug">
