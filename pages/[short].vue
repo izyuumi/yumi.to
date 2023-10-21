@@ -1,3 +1,3 @@
-<template>
-  <RedirectView />
+<template lang="pug">
+RedirectView
 </template>
