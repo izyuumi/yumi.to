@@ -30,6 +30,7 @@ const search = () => {
 
 const copy = (text: string) => {
   navigator.clipboard.writeText(`${window.location.origin}/${text}`)
+  toast('Copied to clipboard')
 }
 
 const editing = ref(false)
@@ -66,6 +67,7 @@ const save = async () => {
     }
     return link
   })
+  toast('Shortlink updated')
   setEditing(false)
 }
 const deleteShortlink = async () => {
@@ -78,6 +80,7 @@ const deleteShortlink = async () => {
   shortlinks.value = shortlinks.value.filter(
     link => link.id !== editingShortlink.value.id
   )
+  toast('Shortlink deleted')
   setEditing(false)
 }
 
@@ -105,7 +108,28 @@ const saveCreate = async () => {
   if (data && shortlinks.value) {
     shortlinks.value = [data, ...shortlinks.value]
   }
+  toast('Shortlink created')
   cancelCreate()
+}
+
+const toastContainer = ref<HTMLDivElement | null>(null)
+const toast = (message: string) => {
+  const toast = document.createElement('div')
+  toast.classList.add(
+    'bg-zinc-800',
+    'text-white',
+    'rounded-md',
+    'p-2',
+    'cursor-pointer'
+  )
+  toast.innerText = message
+  toast.onclick = () => {
+    toast.remove()
+  }
+  toastContainer.value?.appendChild(toast)
+  setTimeout(() => {
+    toast.remove()
+  }, 3000)
 }
 </script>
 
@@ -137,7 +161,7 @@ const setQrcode = (bool: boolean, value?: string) => {
 </script>
 
 <template lang="pug">
-main.w-full.h-screen.flex.items-center.flex-col
+main.w-full.h-screen.flex.items-center.flex-col.relative
   h1 Shortlinks
   div#search.mb-3
     input(type="text" ref="search" v-model="query" @input="search" class="w-full rounded-md p-3 bg-zinc-700 text-white" placeholder="Search")
@@ -168,7 +192,6 @@ main.w-full.h-screen.flex.items-center.flex-col
             button.mr-2.text-gray-400.p-1.rounded-md(@click="setEditing(false)") Cancel
             button.mr-2.text-red-500.p-1.rounded-md(@click="deleteShortlink") Delete
             button.text-green-500.p-1.rounded-md(@click="save") Save
-
   ClientOnly
     HeadlessDialog(:open="qrcode" @close="setQrcode").fixed.top-0.left-0.right-0.bottom-0.flex.justify-center.items-center
       div(class="fixed inset-0 bg-black/30")
@@ -177,4 +200,5 @@ main.w-full.h-screen.flex.items-center.flex-col
           HeadlessDialogTitle {{ `${domain}/${qrcodeValue}` }}
           div.py-2.flex.justify-center.w-full
             img(:src="qrcodeImage" alt="QR Code")
+  div#toast-container.absolute.bottom-0.right-0.p-3.flex.flex-col.gap-2(ref="toastContainer")
 </template>
