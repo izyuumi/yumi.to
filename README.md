@@ -4,6 +4,18 @@ Your personal URL shortener built with Nuxt, Supabase, Vercel, and TailwindCSS.
 
 ![yumi.to](./readme/dashboard.png)
 
+## Features
+
+- 100% free (can be hosted at completely free with Vercel, Supabase, and GitHub) and open-source
+- Create shortlinks via dashboard or an API call
+- Shortlinks can be manually created or automatically generated
+- Use your own domain name
+- Authentication with GitHub or API key
+- Support for various short-link dictionary
+  - From Supabase Database
+  - From JSON-based dictionary
+- Preconfigured iOS Shortcuts
+
 ## Installation
 
 ### Requirements
@@ -78,6 +90,7 @@ create policy "Allow yourself to delete shortlinks" on public.shortlinks for del
 
 - Change `url` in `composables/useExternalRedirect.ts` to whatever you want default redirect to be (e.g. `https://yumiizumi.com`)
 - Change `redirectTo` option in `pages/dashboard.vue` to `<your-domain>/dashboard` (e.g. `https://yumi.to/dashboard`)
+- Change the `pages/blog` directory to whatever you want for specific directory name shortlinks (e.g. `pages/blog` -> `pages/abc` to support links like `yumi.to/abc/xyz`)
 - This project uses TailwindCSS for styling, so you can customize the styles by editing the component classes
 
 ### Using with iOS Shortcuts
