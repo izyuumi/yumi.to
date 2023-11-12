@@ -1,13 +1,15 @@
 <script lang="ts" setup>
-import type Database from '@/types/supabase'
+import type { Database } from '@/types/supabase'
 
 const emptyShortlink: Shortlink = {
   id: '',
   short: '',
-  link: ''
+  link: '',
+  expire: null
 }
 
 const query = ref('')
+const createDate = ref<Date>()
 
 const supabase = useSupabaseClient<Database>()
 const { data } = await supabase
@@ -46,7 +48,10 @@ const startEditing = (id: string) => {
   if (!shortlinks.value) return
   const shortlink = shortlinks.value.find(link => link.id === id)
   if (shortlink) {
-    editingShortlink.value = shortlink
+    editingShortlink.value = {
+      ...shortlink,
+      expire: shortlink.expire ? new Date(shortlink.expire) : null
+    }
   }
 }
 const save = async () => {
@@ -55,7 +60,10 @@ const save = async () => {
     .from('shortlinks')
     .update({
       short: editingShortlink.value.short,
-      link: editingShortlink.value.link
+      link: editingShortlink.value.link,
+      ...(editingShortlink.value.expire && {
+        expire: editingShortlink.value.expire.toISOString()
+      })
     })
     .match({ id: editingShortlink.value.id })
     .select('*')
@@ -94,6 +102,7 @@ const cancelCreate = () => {
   creating.value = false
   createShort.value = ''
   createLink.value = ''
+  createDate.value = undefined
 }
 const saveCreate = async () => {
   const supabase = useSupabaseClient<Database>()
@@ -101,7 +110,10 @@ const saveCreate = async () => {
     .from('shortlinks')
     .insert({
       short: createShort.value,
-      link: createLink.value
+      link: createLink.value,
+      ...(createDate.value && {
+        expire: createDate.value.toISOString()
+      })
     })
     .select('*')
     .single()
@@ -167,11 +179,12 @@ main.w-full.h-screen.flex.items-center.flex-col.relative
     input(type="text" ref="search" v-model="query" @input="search" class="w-full rounded-md p-3 bg-zinc-700 text-white" placeholder="Search")
   div
     ul
-      li
+      li#add-shortlink
         button.text-green-500.p-1.w-full.rounded-md(@click="startCreating" v-if="!creating") Create Shortlink
         form(@submit.prevent="addShortlink" v-if="creating")
           input(type="text" v-model="createShort" class="w-full rounded-md p-2 bg-zinc-700 text-white" placeholder="Short")
           textarea(type="text" v-model="createLink" class="w-full rounded-md p-2 bg-zinc-700 text-white mt-2" placeholder="Long Link")
+          PCalendar(v-model="createDate" show-icon show-time class="mt-2 w-full rounded-md p-2 bg-zinc-700 text-white")
           div.flex.flex-row.justify-center
             button.text-gray-400.p-1.rounded-md(@click="cancelCreate") Cancel
             button.text-green-500.p-1.rounded-md(@click="saveCreate") Add Shortlink
