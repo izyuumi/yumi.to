@@ -6,24 +6,27 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[];
 
-export default interface Database {
+export interface Database {
   public: {
     Tables: {
       shortlinks: {
         Row: {
           created_at: string;
+          expire: string | null;
           id: string;
           link: string;
           short: string;
         };
         Insert: {
           created_at?: string;
+          expire?: string | null;
           id?: string;
           link?: string;
           short?: string;
         };
         Update: {
           created_at?: string;
+          expire?: string | null;
           id?: string;
           link?: string;
           short?: string;
