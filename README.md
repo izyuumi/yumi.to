@@ -99,6 +99,18 @@ create policy "Allow yourself to delete shortlinks" on public.shortlinks for del
 4. Go into Auth Settings in Project Settings on Supabase dashboard to disable
    new user signups.
 
+### Setting up Cron Job for Expiring Shortlinks
+
+In Supabase SQL Editor, run the following query to set up a cron job to delete expired shortlinks every week on Sunday at 02:00 (for customizing cron, see [crontab.guru](https://crontab.guru/#0_2_*_*_0)):
+
+```sql
+select cron.schedule(
+  'weekly-cleanup-of-expired-shortlinks',
+  '0 2 * * 0', -- At 02:00 on Sunday.
+  $$ delete from shortlinks where expire < now() - interval '1 week' $$
+)
+```
+
 ### Customizing
 
 - Change `url` in `composables/useExternalRedirect.ts` to whatever you want
@@ -121,7 +133,7 @@ do this, you can use the following shortcut:
    2. Take the MD5 hash of the API key
    3. Store the MD5 hash of the API key as `API_KEY_HASH` in your Supabase Edge
       Function Secrets Management settings
-2. Get the shortcut [here](https://yumi.to/aa)
+2. Get the iOS shortcut [here](https://yumi.to/aa)
 3. First time you run the shortcut, you will be prompted to enter your domain
    name (e.g. `yumi.to`) and the API key you created in step 1
 4. You are now ready to use the shortcut!
