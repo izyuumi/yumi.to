@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import useExternalRedirect from '@/composables/useExternalRedirect'
-import type Database from '@/types/supabase'
+import type { Database } from '@/types/supabase'
 
 const props = defineProps<{
   destination: string
@@ -34,8 +34,14 @@ if (props.destination) {
     .eq('short', short)
     .maybeSingle()
 
-  if (exactData?.link) {
+  const now = new Date()
+  const expires = exactData?.expire ? new Date(exactData.expire) : null
+  const expired = expires ? now > expires : false
+
+  if (exactData?.link && !expired) {
     useExternalRedirect(exactData.link)
+  } else if (expired) {
+    useExternalRedirect()
   } else {
     const { data: startsWithData } = await supabase
       .from('shortlinks')
@@ -43,7 +49,12 @@ if (props.destination) {
       .like('short', `${short}%`)
       .maybeSingle()
 
-    if (startsWithData?.link) {
+    const expires = startsWithData?.expire
+      ? new Date(startsWithData.expire)
+      : null
+    const expired = expires ? now > expires : false
+
+    if (startsWithData?.link && !expired) {
       useExternalRedirect(startsWithData.link)
     } else {
       useExternalRedirect()
