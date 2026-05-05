@@ -1,12 +1,12 @@
 # yumi.to
 
-Your personal URL shortener built with Nuxt, Supabase, Vercel, and TailwindCSS.
+Your personal URL shortener built with Nuxt, Supabase, Cloudflare Pages, and TailwindCSS.
 
 ![yumi.to](./readme/dashboard.png)
 
 ## Features
 
-- 100% free (can be hosted at completely free with Vercel, Supabase, and GitHub)
+- 100% free (can be hosted at completely free with Cloudflare Pages, Supabase, and GitHub)
   and open-source
 - Create shortlinks via dashboard or an API call
 - Shortlinks can be manually created or automatically generated
@@ -52,15 +52,15 @@ create table public.shortlinks (
 ### Deploying
 
 1. Fork this repository
-2. Create a new Vercel project
-3. Add the following environment variables:
+2. Create a new Cloudflare Pages project connected to your fork
+3. Add the following Cloudflare Pages environment variables:
    - `SUPABASE_URL` (your Supabase URL e.g.
      `https://<your-project>.supabase.co`)
    - `SUPABASE_KEY` (your Supabase public anon key)
    - `BASE_URL` (your domain name e.g. `https://yumi.to`)
 4. Follow the instructions
-   [here](https://vercel.com/docs/projects/domains/add-a-domain) to set up your
-   custom domain.
+   [here](https://developers.cloudflare.com/pages/configuration/custom-domains/)
+   to set up your custom domain.
 
 ### Authentication with GitHub
 
@@ -115,8 +115,8 @@ select cron.schedule(
 
 - Change `url` in `composables/useExternalRedirect.ts` to whatever you want
   default redirect to be (e.g. `https://yumiizumi.com`)
-- Change `redirectTo` option in `pages/dashboard.vue` to
-  `<your-domain>/dashboard` (e.g. `https://yumi.to/dashboard`)
+- Add every deployed URL that should support GitHub sign-in to the allowed
+  redirect URLs in Supabase Auth settings.
 - Change the `pages/blog` directory to whatever you want for specific directory
   name shortlinks (e.g. `pages/blog` -> `pages/abc` to support links like
   `yumi.to/abc/xyz`)
@@ -146,7 +146,7 @@ for details.
 ## Acknowledgements
 
 - [Supabase](https://supabase.io)
-- [Vercel](https://vercel.com)
+- [Cloudflare Pages](https://pages.cloudflare.com)
 - [Nuxt](https://nuxtjs.org)
 - [TailwindCSS](https://tailwindcss.com)
 - [Create a Scalable URL Shortener App Using Nuxt 3, Supabase, and TainwilndCSS](https://youtube.com/watch?v=A3OO1ZVLRjA)

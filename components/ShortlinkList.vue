@@ -10,6 +10,20 @@ const emptyShortlink: Shortlink = {
 
 const query = ref('')
 const createDate = ref<Date>()
+const searchInput = ref<HTMLInputElement | null>(null)
+
+const domain = ref('')
+const qrcode = ref(false)
+const qrcodeValue = ref('')
+const qrcodeImage = ref('')
+const qrcodeUrl = computed(() =>
+  qrcodeValue.value ? `${domain.value}/${qrcodeValue.value}` : ''
+)
+
+onMounted(() => {
+  searchInput.value?.focus()
+  domain.value = window.location.origin
+})
 
 const supabase = useSupabaseClient<Database>()
 const { data } = await supabase
@@ -143,31 +157,18 @@ const toast = (message: string) => {
     toast.remove()
   }, 3000)
 }
-</script>
-
-<script lang="ts">
-import { useQRCode } from '@vueuse/integrations/useQRCode'
-
-export default {
-  mounted() {
-    ;(this.$refs['search'] as HTMLInputElement).focus()
-  }
-}
-
-let domain = ''
-if (typeof window !== 'undefined') {
-  domain = window.location.origin
-}
-const qrcode = ref(false)
-let qrcodeValue = ''
-let qrcodeImage = useQRCode(`${domain}/${qrcodeValue}`)
-const setQrcode = (bool: boolean, value?: string) => {
+const setQrcode = async (bool: boolean, value?: string) => {
   qrcode.value = bool
   if (!bool || !value) {
-    qrcodeValue = ''
-  } else {
-    qrcodeValue = value
-    qrcodeImage = useQRCode(`${domain}/${qrcodeValue}`)
+    qrcodeValue.value = ''
+    qrcodeImage.value = ''
+    return
+  }
+
+  qrcodeValue.value = value
+  if (import.meta.client) {
+    const QRCode = await import('qrcode')
+    qrcodeImage.value = await QRCode.toDataURL(qrcodeUrl.value)
   }
 }
 </script>
@@ -176,7 +177,7 @@ const setQrcode = (bool: boolean, value?: string) => {
 main.w-full.h-screen.flex.items-center.flex-col.relative
   h1 Shortlinks
   div#search.mb-3
-    input(type="text" ref="search" v-model="query" @input="search" class="w-full rounded-md p-3 bg-zinc-700 text-white" placeholder="Search")
+    input(type="text" ref="searchInput" v-model="query" @input="search" class="w-full rounded-md p-3 bg-zinc-700 text-white" placeholder="Search")
   div
     ul
       li#add-shortlink
@@ -210,8 +211,8 @@ main.w-full.h-screen.flex.items-center.flex-col.relative
       div(class="fixed inset-0 bg-black/30")
       div(class="fixed inset-0 flex w-screen items-center justify-center p-4")
         HeadlessDialogPanel.rounded-md.p-4.bg-zinc-800
-          HeadlessDialogTitle {{ `${domain}/${qrcodeValue}` }}
+          HeadlessDialogTitle {{ qrcodeUrl }}
           div.py-2.flex.justify-center.w-full
-            img(:src="qrcodeImage" alt="QR Code")
+            img(v-if="qrcodeImage" :src="qrcodeImage" alt="QR Code")
   div#toast-container.absolute.bottom-0.right-0.p-3.flex.flex-col.gap-2(ref="toastContainer")
 </template>

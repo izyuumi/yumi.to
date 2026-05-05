@@ -12,6 +12,9 @@ export default defineNuxtConfig({
   supabase: {
     redirect: false,
   },
+  nitro: {
+    preset: "cloudflare_pages",
+  },
   robots: {
     UserAgent: "*",
     Disallow: "/",
